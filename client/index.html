@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+<body>
+    <div>
+        <input class="form-control add-id" placeholder="ID" type="text">
+        <input class="form-control add-name" placeholder="NAME" type="text">
+        <input class="form-control add-age" placeholder="AGE" type="text">
+        <input class="form-control add-class" placeholder="CLASS" type="text">
+        <button class="btn btn-primary add-user-action">ADD USER</button>
+
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>NAME</th>
+                    <th>AGE</th>
+                    <th>CLASS</th>
+                </tr>
+            </thead>
+            <tbody class="list-user">
+            </tbody>
+
+        </table>
+    </div>
+    <script>
+        $(document).ready(function () {
+            let listUserTable = $('table .list-user');
+            let addId = $('.add-id');
+            let addName = $('.add-name');
+            let addAge = $('.add-age');
+            let addClass = $('.add-class');
+            let buttonAddUser = $('.add-user-action');
+            function getUser() {
+                $.ajax({
+                    url: 'http://localhost:3000/get-all-user',
+                    method: 'GET'
+                }).done(res => {
+                    listUserTable.empty();
+                    if (res.status_code == 200) {
+                        res.data.forEach((element, index) => {
+                            let row = `
+                            <tr data-index = "${index}">
+                                <td>${element.id}</td>
+                                <td>${element.name}</td>
+                                <td>${element.age}</td>
+                                <td>${element.class}</td>
+                            </tr>
+                        `;
+                            listUserTable.append(row);
+                        });
+                    }
+                });
+            }
+            getUser();
+            buttonAddUser.on('click', () => {
+                let id = addId.val();
+                let name = addName.val();
+                let age = addAge.val();
+                let classUser = addClass.val();
+                let body = {
+                    id,
+                    name,
+                    age,
+                    class: classUser,
+                }
+                $.ajax({
+                    url: 'http://localhost:3000/add-user',
+                    method: 'POST',
+                    data: body
+                }).done(res => {
+                    if (res.status_code == 200) {
+                        getUser();
+                    }
+                })
+            })
+        })
+    </script>
+</body>
+
+</html>
